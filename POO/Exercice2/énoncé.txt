@@ -1,0 +1,5 @@
+Créer une classe Animal avec : un attribut nom et une méthode parler() qui affiche "..."
+
+Puis créer une classe Chien qui hérite de Animal et redéfinit la méthode parler() pour afficher "Woof!".
+
+Tester en créant un Chien("Rex") et en appelant parler().

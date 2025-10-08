@@ -1,0 +1,27 @@
+Exercice 3 : Héritage en losange
+
+On a le cas du diamond problem :
+
+· Classe A avec une méthode afficher() qui affiche "Je suis A".
+
+· Classe B hérite de A et redéfinit afficher() en ajoutant "Je suis B".
+
+· Classe C hérite de A et redéfinit afficher() en ajoutant "Je suis C".
+
+· Classe D hérite de B et C (héritage multiple).
+
+Question :
+
+Que se passe-t-il si on crée d = D() puis d.afficher() ?
+
+Vérifier avec print(D.mro()) pour voir l’ordre de résolution des méthodes (MRO).
+
+MRO ordre d’appel des classes en mutli héritage
+
+
+
+Exercice 4 : Utilisation de super() dans le losange
+
+Reprends l’exercice 3 mais modifie les classes B et C pour utiliser super().afficher() avant d’ajouter leur propre message.
+
+Observer la différence dans l’appel final depuis D. Comparer avec le MRO pour comprendre pourquoi Python arrive à résoudre sans ambiguïté

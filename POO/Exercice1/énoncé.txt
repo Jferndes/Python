@@ -1,0 +1,11 @@
+1. Définir une classe Cercle(). Les objets construits à partir de cette classe seront des cercles 
+de tailles variées. En plus de la méthode constructeur (qui utilisera donc un paramètre rayon), 
+vous définirez une méthode surface(), qui devra renvoyer la surface du cercle.
+2. Définir ensuite une classe Cylindre() dérivée de la précédente. Le constructeur de cette 
+nouvelle classe comportera les deux paramètres rayon et hauteur. Vous y ajouterez une 
+méthode volume() qui devra renvoyer le volume du cylindre (rappel : volume d’un cylindre = 
+surface de section x hauteur).
+3. Ecrire une classe Cone(), qui devra dériver cette fois de la classe Cylindre(), et dont le 
+constructeur comportera lui aussi les deux paramètres rayon et hauteur. Cette nouvelle 
+classe possédera sa propre méthode volume(), laquelle devra renvoyer le volume du cône 
+(rappel : volume d’un cône = volume du cylindre correspondant divisé par 3)

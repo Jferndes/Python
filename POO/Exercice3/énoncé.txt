@@ -1,0 +1,7 @@
+Créer deux classes :
+
+· Volant avec une méthode voler() qui affiche "Je vole !"
+
+· Nageur avec une méthode nager() qui affiche "Je nage !"
+
+Créer une classe Canard qui hérite de Volant et Nageur. Tester en appelant voler() et nager() sur une instance de Canard.
