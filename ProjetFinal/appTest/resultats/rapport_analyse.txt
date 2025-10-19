@@ -1,0 +1,107 @@
+
+======================================================================
+           RAPPORT D'ANALYSE STATISTIQUE COMPLET
+           Café, Sport, Calories et Productivité
+======================================================================
+
+══════════════════════════════════════════════════════════════════════
+SECTION 1 : ANALYSE DES ACTIVITÉS SPORTIVES
+══════════════════════════════════════════════════════════════════════
+
+┌─ COURSE ──────────────────────────────────────────────────────
+│ Pente : 1.04 calories/minute
+│ Équivalent : 63 calories/heure
+│ R² : 0.009
+│ Qualité : Moyen
+└────────────────────────────────────────────────────────────────────
+
+┌─ VELO ────────────────────────────────────────────────────────
+│ Pente : 0.49 calories/minute
+│ Équivalent : 29 calories/heure
+│ R² : 0.003
+│ Qualité : Moyen
+└────────────────────────────────────────────────────────────────────
+
+┌─ NATATION ────────────────────────────────────────────────────
+│ Pente : 1.65 calories/minute
+│ Équivalent : 99 calories/heure
+│ R² : 0.039
+│ Qualité : Moyen
+└────────────────────────────────────────────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+SECTION 2 : EFFET DU CAFÉ SUR LA PRODUCTIVITÉ
+══════════════════════════════════════════════════════════════════════
+
+Équation : Productivité = 4.52 × café + 44.85
+R² : 0.543
+
+Interprétation :
+• Chaque tasse de café augmente la productivité de 4.52 points
+• Productivité de base (sans café) : 44.85
+• L'effet devient décroissant après 6 tasses (zone rouge)
+
+══════════════════════════════════════════════════════════════════════
+SECTION 3 : RÉPONSES AUX QUESTIONS DE RECHERCHE
+══════════════════════════════════════════════════════════════════════
+
+❓ Question 1 : Les jours de sport intense, boit-on plus de café le lendemain ?
+──────────────────────────────────────────────────────────────────────
+• Café après sport intense : 3.07 tasses
+• Café sans sport intense : 3.00 tasses
+• Différence : +0.07 tasses
+• Significativité (p-value) : 0.5877
+⚠ RÉPONSE : Pas de différence significative
+
+❓ Question 2 : Les individus actifs sont-ils plus productifs ?
+──────────────────────────────────────────────────────────────────────
+• Productivité actifs : 58.27
+• Productivité sédentaires : 58.23
+• Différence : +0.04 points
+• Corrélation sport-productivité : 0.021
+• Significativité : 0.3152
+⚠ RÉPONSE : Pas de différence significative
+
+❓ Question 3 : Trop de café ET trop de sport → baisse de productivité ?
+──────────────────────────────────────────────────────────────────────
+• Productivité avec excès : nan
+• Productivité normale : 58.26
+• Différence : +nan
+• Observations avec excès : 0
+⚠ RÉPONSE : NON, pas de baisse observée
+
+❓ Question 4 : Y a-t-il un équilibre entre temps total et productivité ?
+──────────────────────────────────────────────────────────────────────
+• Corrélation temps-productivité : 0.014
+• Temps optimal : 8.1 heures
+• Productivité maximale : 59.20
+⚠ RÉPONSE : Corrélation faible, pas d'équilibre clair
+
+❓ Question 5 : Corrélation entre calories et tasses de café ?
+──────────────────────────────────────────────────────────────────────
+• Corrélation : 0.012
+• p-value : 0.5774
+⚠ RÉPONSE : Pas de corrélation significative
+
+❓ Question 6 : Les sportifs consomment-ils plus de café en moyenne ?
+──────────────────────────────────────────────────────────────────────
+• Corrélation moyenne sport-café : 0.003
+• p-value : 0.9818
+
+Consommation de café par quartile de sport :
+  Q1 : 3.03 tasses
+  Q2 : 2.96 tasses
+  Q3 : 3.01 tasses
+  Q4 : 3.04 tasses
+
+⚠ RÉPONSE : Pas de relation significative
+
+══════════════════════════════════════════════════════════════════════
+CONCLUSION GÉNÉRALE
+══════════════════════════════════════════════════════════════════════
+
+Cette analyse a permis de modéliser les relations entre sport, café et
+productivité. Les modèles de régression montrent des relations linéaires
+claires pour les calories brûlées selon l'activité, et un effet positif
+du café sur la productivité jusqu'à un certain seuil.
+

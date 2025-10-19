@@ -1,0 +1,283 @@
+# Exemples d'Utilisation Avancée
+
+## 📊 Utiliser les modules individuellement
+
+Vous pouvez utiliser chaque module séparément pour des analyses personnalisées.
+
+### Exemple 1 : Analyse simple d'une activité
+
+```python
+from donnees.chargementDonnees import chargerDonneesSport
+from donnees.nettoyageDonnees import nettoyerDonneesSport, filtrerParActivite
+from analyse.regressionLineaire import regressionLineaireSimple
+from visualisation.graphiquesRegression import tracerScatterAvecRegression
+
+# Charger et nettoyer
+dfSport = chargerDonneesSport('sport_raw.csv')
+dfSportClean = nettoyerDonneesSport(dfSport)
+
+# Filtrer pour le vélo uniquement
+dfVelo = filtrerParActivite(dfSportClean, 'velo')
+
+# Régression
+x = dfVelo['duree'].values
+y = dfVelo['calories'].values
+resultats = regressionLineaireSimple(x, y)
+
+# Visualiser
+tracerScatterAvecRegression(resultats, 'velo', 'mon_analyse_velo.png')
+
+print(f"Pente : {resultats['pente']:.2f} calories/min")
+print(f"R² : {resultats['r2']:.3f}")
+```
+
+### Exemple 2 : Calculer des statistiques descriptives
+
+```python
+from donnees.chargementDonnees import chargerDonneesTravail
+from donnees.nettoyageDonnees import nettoyerDonneesTravail
+from analyse.statistiques import calculerStatistiquesDescriptives, afficherStatistiques
+
+# Charger données
+dfTravail = chargerDonneesTravail('travail_raw.csv')
+dfTravailClean = nettoyerDonneesTravail(dfTravail)
+
+# Statistiques sur le café
+statsCafe = calculerStatistiquesDescriptives(
+    dfTravailClean['tasses_cafe'].values,
+    'Consommation de café'
+)
+afficherStatistiques(statsCafe)
+
+# Statistiques sur la productivité
+statsProductivite = calculerStatistiquesDescriptives(
+    dfTravailClean['productivite'].values,
+    'Productivité'
+)
+afficherStatistiques(statsProductivite)
+```
+
+### Exemple 3 : Analyse de corrélation personnalisée
+
+```python
+from donnees.chargementDonnees import chargerDonneesSport, chargerDonneesTravail
+from donnees.nettoyageDonnees import nettoyerDonneesSport, nettoyerDonneesTravail, fusionnerDonnees
+from analyse.statistiques import calculerCorrelation
+
+# Charger et fusionner
+dfSport = nettoyerDonneesSport(chargerDonneesSport('sport_raw.csv'))
+dfTravail = nettoyerDonneesTravail(chargerDonneesTravail('travail_raw.csv'))
+dfFusion = fusionnerDonnees(dfSport, dfTravail)
+
+# Corrélation personnalisée
+corr, pValue = calculerCorrelation(
+    dfFusion['duree_sport'].values,
+    dfFusion['tasses_cafe'].values
+)
+
+print(f"Corrélation durée sport - café : {corr:.3f}")
+print(f"P-value : {pValue:.4f}")
+print(f"Significatif : {'Oui' if pValue < 0.05 else 'Non'}")
+```
+
+### Exemple 4 : Créer un graphique personnalisé
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from visualisation.utilitairesGraphiques import configurerStyle, sauvegarderGraphique, obtenirCouleur
+
+# Configuration
+configurerStyle()
+
+# Données exemple
+activites = ['course', 'velo', 'natation']
+moyennes_calories = [590, 450, 480]
+
+# Créer graphique
+fig, ax = plt.subplots(figsize=(10, 6))
+
+couleurs = [obtenirCouleur(act) for act in activites]
+bars = ax.bar(activites, moyennes_calories, color=couleurs, alpha=0.7, edgecolor='black')
+
+# Ajouter valeurs
+for bar, val in zip(bars, moyennes_calories):
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height,
+            f'{val:.0f}',
+            ha='center', va='bottom', fontweight='bold')
+
+ax.set_xlabel('Activité', fontweight='bold')
+ax.set_ylabel('Calories moyennes/heure', fontweight='bold')
+ax.set_title('Dépense énergétique moyenne par activité', fontweight='bold', pad=15)
+ax.grid(True, alpha=0.3, axis='y')
+
+plt.tight_layout()
+sauvegarderGraphique('comparaison_personnalisee.png')
+plt.show()
+```
+
+### Exemple 5 : Régression multivariée personnalisée
+
+```python
+import numpy as np
+from donnees.chargementDonnees import chargerDonneesSport
+from donnees.nettoyageDonnees import nettoyerDonneesSport, filtrerParActivite
+from analyse.regressionLineaire import regressionLineaireMultiple
+
+# Charger données
+dfSport = nettoyerDonneesSport(chargerDonneesSport('sport_raw.csv'))
+dfCourse = filtrerParActivite(dfSport, 'course')
+
+# Préparer variables indépendantes (durée, poids, autre facteur si disponible)
+X = np.column_stack([
+    dfCourse['duree'].values,
+    dfCourse['poids_kg'].values
+])
+
+y = dfCourse['calories'].values
+
+# Régression
+resultats = regressionLineaireMultiple(X, y)
+
+print("Coefficients de la régression multivariée :")
+print(f"  Durée : {resultats['coefficients'][0]:.3f} cal/min")
+print(f"  Poids : {resultats['coefficients'][1]:.3f} cal/kg")
+print(f"  Intercept : {resultats['intercept']:.3f}")
+print(f"  R² : {resultats['r2']:.3f}")
+```
+
+## 🔧 Modifier les paramètres
+
+### Changer les seuils d'analyse
+
+```python
+from analyse.correlations import analyserSportIntenseCafe
+
+# Utiliser un seuil personnalisé (par défaut 60 min)
+resultats = analyserSportIntenseCafe(dfFusion, seuilIntense=45)
+
+# ou pour les individus actifs
+from analyse.correlations import analyserActifProductif
+resultats = analyserActifProductif(dfFusion, seuilActif=20)
+```
+
+### Personnaliser les couleurs
+
+Modifiez `config/constantes.py` :
+
+```python
+COULEURS_ACTIVITES = {
+    'course': '#FF0000',      # Rouge vif
+    'velo': '#00FF00',        # Vert vif
+    'natation': '#0000FF'     # Bleu vif
+}
+```
+
+### Changer la résolution des images
+
+Dans `config/constantes.py` :
+
+```python
+DPI_SAUVEGARDE = 150  # Pour des fichiers plus légers (défaut: 300)
+# ou
+DPI_SAUVEGARDE = 600  # Pour une qualité supérieure
+```
+
+## 📈 Analyses supplémentaires
+
+### Analyse par individu
+
+```python
+# Analyser un individu spécifique
+dfIndividu = dfFusion[dfFusion['individu_id'] == 1]
+
+# Tracer son évolution temporelle
+import matplotlib.pyplot as plt
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
+
+ax1.plot(dfIndividu['date'], dfIndividu['tasses_cafe'], 'o-', label='Café')
+ax1.set_ylabel('Tasses de café')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+ax2.plot(dfIndividu['date'], dfIndividu['productivite'], 'o-', color='green', label='Productivité')
+ax2.set_ylabel('Productivité')
+ax2.set_xlabel('Date')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('resultats/evolution_individu_1.png', dpi=300)
+```
+
+### Matrice de corrélation complète
+
+```python
+from analyse.statistiques import creerMatriceCorrelation
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Colonnes à analyser
+colonnes = ['tasses_cafe', 'heures_travail', 'productivite', 'duree_sport', 'calories_sport']
+
+# Créer matrice
+matrice = creerMatriceCorrelation(dfFusion, colonnes)
+
+# Visualiser
+fig, ax = plt.subplots(figsize=(10, 8))
+im = ax.imshow(matrice, cmap='coolwarm', vmin=-1, vmax=1)
+
+# Annotations
+for i in range(len(colonnes)):
+    for j in range(len(colonnes)):
+        text = ax.text(j, i, f'{matrice.iloc[i, j]:.2f}',
+                      ha="center", va="center", color="black", fontweight='bold')
+
+ax.set_xticks(np.arange(len(colonnes)))
+ax.set_yticks(np.arange(len(colonnes)))
+ax.set_xticklabels(colonnes, rotation=45, ha='right')
+ax.set_yticklabels(colonnes)
+ax.set_title('Matrice de corrélation', fontweight='bold', pad=15)
+
+plt.colorbar(im, ax=ax, label='Coefficient de corrélation')
+plt.tight_layout()
+plt.savefig('resultats/matrice_correlation.png', dpi=300)
+```
+
+### Analyse temporelle (tendances)
+
+```python
+# Tendance de la consommation de café au fil du temps
+dfTravail['mois'] = dfTravail['date'].dt.to_period('M')
+tendance = dfTravail.groupby('mois')['tasses_cafe'].mean()
+
+plt.figure(figsize=(12, 6))
+plt.plot(tendance.index.to_timestamp(), tendance.values, 'o-', linewidth=2)
+plt.xlabel('Mois', fontweight='bold')
+plt.ylabel('Tasses de café (moyenne)', fontweight='bold')
+plt.title('Évolution de la consommation de café', fontweight='bold', pad=15)
+plt.grid(True, alpha=0.3)
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('resultats/tendance_cafe.png', dpi=300)
+```
+
+## 🎓 Conseils pour analyses avancées
+
+1. **Toujours nettoyer les données** avant toute analyse
+2. **Vérifier les valeurs manquantes** avec `df.isnull().sum()`
+3. **Inspecter les distributions** avec des histogrammes
+4. **Tester la normalité** des résidus avec Q-Q plots
+5. **Valider les hypothèses** de régression (linéarité, homoscédasticité)
+6. **Interpréter les p-values** : < 0.05 = significatif
+7. **Considérer le R²** : > 0.7 = bon modèle
+
+## 💡 Bonnes pratiques
+
+- Sauvegarder les résultats intermédiaires
+- Documenter vos modifications
+- Créer des copies des données avant transformation
+- Utiliser des noms de variables explicites
+- Commenter le code pour faciliter la maintenance
