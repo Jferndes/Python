@@ -127,7 +127,7 @@ def nettoyageDataTravail(dfTravail: pd.DataFrame) -> pd.DataFrame:
     # Extraire les chiffres par l'expression régulière
     dfClean['tasses_cafe'] = dfClean['tasses_cafe'].str.extract(r'(\d+)')[0]
     # Convertir en entier
-    dfClean['tasses_cafe'] = pd.to_numeric(dfClean['tasses_cafe'], errors='coerce').astype('Int64')
+    dfClean['tasses_cafe'] = pd.to_numeric(dfClean['tasses_cafe'], errors='coerce').astype('int64')
     print('Après correction:', dfClean['tasses_cafe'].unique())
     print()
 

@@ -1,3 +1,4 @@
+from turtle import mode
 import pandas as pd
 import numpy as np
 
@@ -18,7 +19,19 @@ if __name__ == "__main__":
     print('='*80)
     dfSport = nettoyageDataSport(dfSport)
     infoDataFrame(dfSport)
+    dfSport.to_csv('./data/sport_clean.csv', index=True)
+    #for activite in ['course', 'natation', 'velo']:
+    #    modeliserActiviteSimple(dfSport, activite)
 
-    for activite in ['course', 'natation', 'velo']:
-        modeliserActiviteSimple(dfSport, activite)
-    
+    #for activite in ['course', 'natation', 'velo']:
+    #modeliserActiviteMultivariee(dfSport, 'velo')'''
+
+    # ========== PARTIE 2: DONNÉES PRODUCTIVITÉ ==========
+    '''cheminCSV = './data/travail_raw.csv'
+    dfTravail = loadData(cheminCSV)
+    print('\n' + '='*80)
+    print('NETTOYAGE DES DONNÉES PRODUCTIVITÉ')
+    dfTravail = nettoyageDataTravail(dfTravail)
+    infoDataFrame(dfTravail)
+    modeliserProductiviteSimple(dfTravail)
+    modeliserProductiviteQuadra(dfTravail)'''

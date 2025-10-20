@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy import stats
+from scipy import linalg
 import matplotlib.pyplot as plt
 
 MET_VALUES = {
@@ -64,8 +65,8 @@ def modeliserActiviteMultivariee(dfSport: pd.DataFrame, activite: str):
 
     X = np.column_stack([X1, X2, np.ones_like(X1)])
 
-    # Moindres carrés
-    beta, residuals, rank, s = np.linalg.lstsq(X, Y, rcond=None)
+    # Moindres carrés avec scipy
+    beta, residuals, rank, s = linalg.lstsq(X, Y)
     a, b, c = beta
 
     # R^2
@@ -112,7 +113,48 @@ def tracerRegression3D(X_duree: np.ndarray, X_poids: np.ndarray, Y: np.ndarray,
     plt.savefig(f'../app/resultats/RegressionLineaireMultiple_{activite}.png', dpi=300, bbox_inches='tight')
     plt.show()
 
+    '''    
+    correlation linéaire numpy
+    correlation linéaire numpy
+    correlation linéaire numpy
+    '''
 
-    correlation linéaire numpy
-    correlation linéaire numpy
-    correlation linéaire numpy
+def modeliserProductiviteSimple(dfTravail: pd.DataFrame) -> None:
+    # Sélection des colonnes
+    dfTravail = dfTravail[(dfTravail['tasses_cafe'] >= 0) & (dfTravail['tasses_cafe'] <= 6)][['heures_travail', 'tasses_cafe', 'productivite']]
+    print(dfTravail.head())
+
+    X = dfTravail['tasses_cafe'].values
+    Y = dfTravail['productivite'].values
+    # Calcul de la régression linéaire
+    slope, intercept, r_value, p_value, std_er = stats.linregress(X, Y)
+    print(f"Régression linéaire : productivite = {slope:.4f}*x + {intercept:.4f} (R²={r_value**2:.3f})")
+    r2 = r_value**2
+    print(f"R² = {r2:.3f}")
+
+    tracerRegression(X, Y, slope, intercept, 'productivité')
+
+def modeliserProductiviteQuadra(dfTravail: pd.DataFrame):
+    X = dfTravail['tasses_cafe'].values
+    Y = dfTravail['productivite'].values
+    coeffs = np.polyfit(X, Y, 2)  # 2 = degré du polynôme
+    a, b, c = coeffs
+    print(f"Régression quadratique : productivite = {a:.4f}*x^2 + {b:.4f}*x + {c:.4f}")
+    max = -b / (2 * a)
+    print(f"Maximum de productivité : {max:.4f} tasses de café")
+    r2 = 1 - (np.sum((Y - np.polyval(coeffs, X))**2) / np.sum((Y - np.mean(Y))**2))
+    print(f"R² = {r2:.3f}")
+
+    # Tracer la courbe
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X, Y, color='blue', label='Données observées', alpha=0.5)
+    x_s = np.linspace(X.min(), X.max(), 100)
+    y_s = a * x_s**2 + b * x_s + c
+    plt.plot(x_s, y_s, 'r', label='Régression quadratique \n y = {:.2f}x² + {:.2f}x + {:.2f}'.format(a, b, c))
+    plt.xlabel('Tasses de café')
+    plt.ylabel('Productivité')
+    plt.title('Régression quadratique de la productivité en fonction des tasses de café')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    #plt.savefig(f'../app/resultats/RegressionQuadratique_productivite.png', dpi=300, bbox_inches='tight')
+    plt.show()
