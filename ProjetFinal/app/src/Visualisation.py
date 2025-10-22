@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
-from matplotlib import cm
 import numpy as np
 
 '''
 Tracé de la régression linéaire des calories brulées en fonction de la durée de l'activité
 '''
-def tracerRegression(X: np.ndarray, Y: np.ndarray, pente: float, ordonneeOrigine: float, activite: str) -> None:
+def tracerRegression(X: np.ndarray, Y: np.ndarray, pente: float, ordonneeOrigine: float, activite: str, show: bool = False) -> None:
     plt.figure(figsize=(10, 6))
     
     #Nuage de points
@@ -34,14 +33,15 @@ def tracerRegression(X: np.ndarray, Y: np.ndarray, pente: float, ordonneeOrigine
     print(f"    Graphique de régression linéaire sauvegardé sous: '/app/resultats/RegressionLineaire_{activite}.png'")
 
     #Afficher le graphique
-    #plt.show()
+    if show:
+        plt.show()
     plt.close()
 
 
 '''
 Tracé de la régression linéaire multivarié des calories brulées en fonction de la durée de l'activité
 '''
-def tracerRegression3D(X_duree: np.ndarray, X_poids: np.ndarray, Y: np.ndarray, a: float, b: float, c: float, activite: str, r2: float) -> None:
+def tracerRegression3D(X_duree: np.ndarray, X_poids: np.ndarray, Y: np.ndarray, a: float, b: float, c: float, activite: str, r2: float, show: bool = False) -> None:
 
     fig = plt.figure(figsize=(10, 6))
     ax = fig.add_subplot(111, projection='3d')
@@ -71,10 +71,12 @@ def tracerRegression3D(X_duree: np.ndarray, X_poids: np.ndarray, Y: np.ndarray, 
     plt.tight_layout()
     plt.savefig(f'../app/resultats/RegressionLineaireMultivariée_{activite}.png', dpi=300, bbox_inches='tight')
     print(f"    Graphique de régression linéaire sauvegardé sous: '/app/resultats/RegressionLineaireMultivariée_{activite}.png'")
-    #plt.show()
+    
+    if show:
+        plt.show()
     plt.close()
 
-def tracerPolynome(X: np.ndarray, Y: np.ndarray, coeffs: np.ndarray) -> None:
+def tracerPolynome(X: np.ndarray, Y: np.ndarray, coeffs: np.ndarray, show: bool = False) -> None:
     plt.figure(figsize=(10, 6))
     
     #Nuage de points
@@ -99,5 +101,6 @@ def tracerPolynome(X: np.ndarray, Y: np.ndarray, coeffs: np.ndarray) -> None:
     print(f"    Graphique de régression polynomiale sauvegardé sous: '/app/resultats/RegressionPolynomiale_productivite.png'")
 
     #Afficher le graphique
-    #plt.show()
+    if show:
+        plt.show()
     plt.close()
