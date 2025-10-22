@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 
 '''
 Construire un DataFrame à partir d'un fichier CSV
@@ -33,82 +32,87 @@ def infoDataFrame(data: pd.DataFrame) -> None:
 '''
 Nettoyer les données du dataframe sport
 '''
-def nettoyageDataSport(dfSport: pd.DataFrame) -> pd.DataFrame:
-    print('### START nettoyageDataSport ###')
+def nettoyageDataSport(dfSport: pd.DataFrame, debug: bool = False) -> pd.DataFrame:
+    if debug: print('### START nettoyageDataSport ###')
+    if dfSport is None:
+        print("Erreur: DataFrame est None, impossible de nettoyer les données.")
+        return None
     dfClean = dfSport.copy()
 
-    print('tableau des valeurs manquantes avant nettoyage:')
+    if debug: print('tableau des valeurs manquantes avant nettoyage:')
     na_before = dfClean.isna().sum()
-    print(na_before.to_frame('NA_avant'))
-    print()
+    if debug: print(na_before.to_frame('NA_avant'))
+    if debug: print()
     
     # Correction des valeurs manquantes dans la colonne 'poids_kg' par la moyenne
-    print(f"Moyenne poids_kg avant nettoyage: {dfClean['poids_kg'].mean()}")
+    if debug: print(f"Moyenne poids_kg avant nettoyage: {dfClean['poids_kg'].mean()}")
     dfClean['poids_kg'] = dfClean['poids_kg'].transform(lambda s: s.fillna(s.mean()))
-    print(f"Moyenne poids_kg après nettoyage: {dfClean['poids_kg'].mean()}")
-    print()
+    if debug: print(f"Moyenne poids_kg après nettoyage: {dfClean['poids_kg'].mean()}")
+    if debug: print()
     
     dfClean = dfClean.dropna()
-    print('tableau des valeurs manquantes après nettoyage:')
+    if debug:print('tableau des valeurs manquantes après nettoyage:')
     na_after = dfClean.isna().sum()
-    print(na_after.to_frame('NA_apres'))
-    print()
+    if debug: print(na_after.to_frame('NA_apres'))
+    if debug: print()
 
     # Gestion des dates invalides dans la colonne 'date'
     dfClean['date'] = pd.to_datetime(dfClean['date'], errors='coerce')
     dfClean = dfClean.dropna(subset=['date'])
 
     # Convertir toutes les durées en minutes
-    print('Conversion des durées en minutes:')
-    print(dfClean[['duree','unite']].head())
+    if debug: print('Conversion des durées en minutes:')
+    if debug: print(dfClean[['duree','unite']].head())
     dfHeures = dfClean['unite'] == 'h'
     dfClean.loc[dfHeures, 'duree'] = dfClean.loc[dfHeures, 'duree'] * 60
     dfClean['unite'] = 'min'
-    print('---------------- Après conversion ------------------')
-    print(dfClean[['duree','unite']].head())
-    print(dfClean['unite'].unique())
-    print()
+    if debug: print('---------------- Après conversion ------------------')
+    if debug: print(dfClean[['duree','unite']].head())
+    if debug: print(dfClean['unite'].unique())
+    if debug: print()
 
     # Corriger les noms des sports
-    print('Correction des noms des sports:')
-    print('Avant correction:', dfClean['activite'].unique())
+    if debug: print('Correction des noms des sports:')
+    if debug: print('Avant correction:', dfClean['activite'].unique())
     corrections = {
         'run': 'course',
         'cours': 'course',
         'velò': 'velo'
     }
     dfClean['activite'] = dfClean['activite'].replace(corrections)
-    print('Après correction:', dfClean['activite'].unique())
-    print()
+    if debug: print('Après correction:', dfClean['activite'].unique())
+    if debug: print()
 
-    print('### END nettoyageDataSport ###')
-    print()
+    print('Données sport nettoyées avec succès.\n')
     return dfClean
 
 
 '''
 Nettoyer les données du dataframe travail
 '''
-def nettoyageDataTravail(dfTravail: pd.DataFrame) -> pd.DataFrame:
-    print('### START nettoyageDataTravail ###')
+def nettoyageDataTravail(dfTravail: pd.DataFrame, debug: bool = False) -> pd.DataFrame:
+    if debug: print('### START nettoyageDataTravail ###')
+    if dfTravail is None:
+        print("Erreur: DataFrame est None, impossible de nettoyer les données.")
+        return None
     dfClean = dfTravail.copy()
 
-    print('tableau des valeurs manquantes avant nettoyage:')
+    if debug: print('tableau des valeurs manquantes avant nettoyage:')
     na_before = dfClean.isna().sum()
-    print(na_before.to_frame('NA_avant'))
-    print()
+    if debug: print(na_before.to_frame('NA_avant'))
+    if debug: print()
     
     # Correction des valeurs manquantes dans la colonne 'heures_travail' par la moyenne
-    print(f"Moyenne heures_travail avant nettoyage: {dfClean['heures_travail'].mean()}")
+    if debug: print(f"Moyenne heures_travail avant nettoyage: {dfClean['heures_travail'].mean()}")
     dfClean['heures_travail'] = dfClean['heures_travail'].transform(lambda s: s.fillna(s.mean()))
-    print(f"Moyenne heures_travail après nettoyage: {dfClean['heures_travail'].mean()}")
-    print()
-    
+    if debug: print(f"Moyenne heures_travail après nettoyage: {dfClean['heures_travail'].mean()}")
+    if debug: print()
+
     dfClean = dfClean.dropna()
-    print('tableau des valeurs manquantes après nettoyage:')
+    if debug: print('tableau des valeurs manquantes après nettoyage:')
     na_after = dfClean.isna().sum()
-    print(na_after.to_frame('NA_apres'))
-    print()
+    if debug: print(na_after.to_frame('NA_apres'))
+    if debug: print()
 
     # Gestion des dates invalides dans la colonne 'date'
     dfClean['date'] = pd.to_datetime(dfClean['date'], errors='coerce')
@@ -120,17 +124,16 @@ def nettoyageDataTravail(dfTravail: pd.DataFrame) -> pd.DataFrame:
         'trois': '3',
         'cinq': '5'
     }
-    print('Correction des valeurs du nombre de tasses de café:')
-    print('Avant correction:', dfClean['tasses_cafe'].unique())
+    if debug: print('Correction des valeurs du nombre de tasses de café:')
+    if debug: print('Avant correction:', dfClean['tasses_cafe'].unique())
     # Remplacer les mots par des chiffres
     dfClean['tasses_cafe'] = dfClean['tasses_cafe'].replace(corrections)
     # Extraire les chiffres par l'expression régulière
     dfClean['tasses_cafe'] = dfClean['tasses_cafe'].str.extract(r'(\d+)')[0]
     # Convertir en entier
     dfClean['tasses_cafe'] = pd.to_numeric(dfClean['tasses_cafe'], errors='coerce').astype('int64')
-    print('Après correction:', dfClean['tasses_cafe'].unique())
-    print()
+    if debug: print('Après correction:', dfClean['tasses_cafe'].unique())
+    if debug: print()
 
-    print('### END nettoyageDataTravail ###')
-    print()
+    print('Données sport nettoyées avec succès.\n')
     return dfClean
