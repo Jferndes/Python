@@ -7,8 +7,7 @@ from src.Visualisation import *
 '''
     Analyse des activités sportives
 '''
-def analyseSport():
-    print("### ANALYSE DES ACTIVITÉS SPORTIVES ###\n")
+def analyseSportLineaire():
     try:
         dfSport = getSportDF()
     except Exception as e:
@@ -29,11 +28,32 @@ def analyseSport():
         print(f"  R² = {r_value**2:.3f}")
         print(f"  p-value: {p_value:.2f}")
         print(f"  Erreur standard: {std_er:.2f} et t = a / std_er = {slope/std_er:.2f}")
-
+        
+        res["lineaire"]["activite"].append(activite)
         #Visualisation
         tracerRegression(X, Y, slope, intercept, activite)
     print()
 
+    res = {
+        "activite": [
+            "nom",
+            "slope",
+            "intercept",
+            "r2",
+            "p_value",
+            "std_error"
+        ]
+    }
+    return res
+
+def analyseSportMultivariee():
+    try:
+        dfSport = getSportDF()
+    except Exception as e:
+        print(f"Impossible de continuer : les données n'ont pas pu être chargées. Erreur: {e}")
+        return
+
+    resultats = []
     print("Analyse des activités sportives multivariée:")
     for activite in ['course', 'natation', 'velo']:
         # Modélisation par regression linéaire
@@ -59,9 +79,35 @@ def analyseSport():
         print(f"        Modèle: {calModele:.2f} kcal")
         print(f"        Ecart relatif: {ecartRelatif:.2f}%")
 
+        resActivite = {
+            "activite": activite,
+            "coefficients": {
+                "a": a,
+                "b": b,
+                "c": c
+            },
+            "stats": {
+                "rang": rank,
+                "residus": residuals,
+                "s": s.tolist(),
+                "k": k,
+                "r2": r2,
+                "rmse": rmse,
+            },
+            "comparaison": {
+                "calories_MET": calMET,
+                "calories_modele": calModele,
+                "ecartRelatif": ecartRelatif
+            }
+        }
+        resultats.append(resActivite)
+
         #Visualisation
         tracerRegression3D(X1, X2, Y, a, b, c, activite, r2)
     print()
+
+    return resultats
+            
 
 
 '''
@@ -92,7 +138,7 @@ def analyseTravail():
     print(f"  Erreur standard: {std_er:.2f} et t = a / std_er = {slope/std_er:.2f}")
 
     #Visualisation
-    tracerRegression(X, Y, slope, intercept, "productivité")
+    tracerRegression(X, Y, slope, intercept, "productivite")
     print()
 
     print("Analyse productivité polynomiale:")
@@ -100,11 +146,36 @@ def analyseTravail():
     print(f"Productivité: -> y = {a:.2f}x² + {b:.2f}x + {c:.2f}")
     print(f"  Maximum: {max:.2f} tasses de café")
     print(f"  R²: {r2:.3f}")
-    print(f"    Le coefficient a est négatif ({a:.2f}). Cela indique que la productivité augmente jusqu'à un maximum ({max:.2f}), puis diminue.\n    Dans le cas 0-6 tasses, on s'apparente à une droite croissante. Donc plus on boit de café, plus on est productif.")
+    print()
+    
+    conclusion = f"Le coefficient a est négatif ({a:.2f}). Cela indique que la productivité augmente jusqu'à un maximum ({max:.2f}), puis diminue.\n    Dans le cas 0-6 tasses, on s'apparente à une droite croissante. Donc plus on boit de café, plus on est productif."
+    print(conclusion)
+    print()
 
     #Visualisation
-    tracerPolynome(X, Y, np.array([a, b, c]), "productivite")
+    tracerPolynome(X, Y, np.array([a, b, c]))
     print()
+
+    res = {
+        "lineaire": {
+            "slope": slope,
+            "intercept": intercept,
+            "r2": r_value**2,
+            "p_value": p_value,
+            "std_error": std_er
+        },
+        "polynome": {
+            "coefficients": {
+                "a": a,
+                "b": b,
+                "c": c
+            },
+            "r2": r2,
+            "maximum": max
+        },
+        "conclusion": conclusion
+    }
+    return res
 
 
 '''
@@ -178,11 +249,44 @@ def analyseSportEtCafeLendemain():
     print(f"Différence de moyenne: {diffMoyenne:.2f} tasses")
 
     tStat, pValue = stats.ttest_ind(cafeApresIntense, cafeApresNormal)
+    conclusion = "On constate une tres legere tendance a boire un peu moins de cafe le lendemain d un sport intense, mais cette difference est statistiquement faible et pratiquement negligeable"
     print(f"Statistique t: {tStat:.4f}")
     print(f"P-value: {pValue:.4f}")
     print(f"Seuil α: 0.05")
-    print("On constate une très légère tendance à boire un peu moins de café le lendemain d’un sport intense, mais cette différence est statistiquement faible et pratiquement négligeable")
+    print(conclusion)
     print()
+
+    #json réponse
+    res = {
+        "conclusion": conclusion,
+        "corr": {
+            "corr_pearson": corr_pearson,
+            "p_value": p_corr
+        },
+        "ttest": {
+            "diff_moyenne": diffMoyenne,
+            "t_stat": tStat,
+            "p_value": pValue
+        },
+        "stats":[
+            {
+                "type": "intense",
+                "n": len(cafeApresIntense),
+                "moyenne": cafeApresIntense.mean(),
+                "std": cafeApresIntense.std(),
+                "mediane": cafeApresIntense.median()
+            },
+            {
+                "type": "normal",
+                "n": len(cafeApresNormal),
+                "moyenne": cafeApresNormal.mean(),
+                "std": cafeApresNormal.std(),
+                "mediane": cafeApresNormal.median()
+            }
+        ]
+    }
+
+    return res
 
 
 def analyseActifProductivite():
@@ -223,6 +327,28 @@ def analyseActifProductivite():
     corrPearson, pValuePearson = stats.pearsonr(dfMerge['caloriesMoyennes'], dfMerge['productiviteMoyenne'])
 
     print(f"Corrélation de Pearson: {corrPearson:.4f} (p = {pValuePearson:.4f})")
+    conclusion = "Il ne semble pas y avoir de corrélation entre le niveau d'activité moyen et la productivité moyenne."
+    print(conclusion)
+
+    #json réponse
+    res = {
+        "n": len(dfMerge),
+        "calories_moyennes": {
+            "moyenne": dfMerge['caloriesMoyennes'].mean(),
+            "std": dfMerge['caloriesMoyennes'].std()
+        },
+        "productivite_moyenne": {
+            "moyenne": dfMerge['productiviteMoyenne'].mean(),
+            "std": dfMerge['productiviteMoyenne'].std()
+        },
+        "conclusion": conclusion,
+        "corr": {
+            "corr_pearson": corrPearson,
+            "p_value": pValuePearson
+        }
+    }
+
+    return res
 
 
 def analyseSurchargeProductivite():
@@ -266,6 +392,11 @@ def analyseSurchargeProductivite():
     groupeCafeSeul = dfMerge[(dfMerge['cafeEleve']) & (~dfMerge['sportEleve'])]
     groupeSportSeul = dfMerge[(~dfMerge['cafeEleve']) & (dfMerge['sportEleve'])]
     groupeDoubleSurcharge = dfMerge[(dfMerge['cafeEleve']) & (dfMerge['sportEleve'])]
+
+    ecartRelatif = lambda x, y: 100 * (x - y) / y if y != 0 else 0.0
+    ecartGroupeCafeSeul = ecartRelatif(groupeCafeSeul['productivite'].mean(), groupeNormal['productivite'].mean())
+    ecartGroupeSportSeul = ecartRelatif(groupeSportSeul['productivite'].mean(), groupeNormal['productivite'].mean())
+    ecartGroupeDoubleSurcharge = ecartRelatif(groupeDoubleSurcharge['productivite'].mean(), groupeNormal['productivite'].mean())
     
     print(f"Normal (café normal + sport normal):")
     print(f"    nb elemennts = {len(groupeNormal)}") 
@@ -273,15 +404,15 @@ def analyseSurchargeProductivite():
     print(f"Café élevé seul:")
     print(f"    nb elemennts = {len(groupeCafeSeul)}")
     print(f"    productivite moyenne = {groupeCafeSeul['productivite'].mean():.2f}")
-    print(f"    soit +{100*(groupeCafeSeul['productivite'].mean() - groupeNormal['productivite'].mean())/groupeNormal['productivite'].mean():.2f}% par rapport au normal")
+    print(f"    soit +{ecartGroupeCafeSeul:.2f}% par rapport au normal")
     print(f"Sport élevé seul:")
     print(f"    nb elemennts = {len(groupeSportSeul)}")
     print(f"    productivite moyenne = {groupeSportSeul['productivite'].mean():.2f}")
-    print(f"    soit +{100*(groupeSportSeul['productivite'].mean() - groupeNormal['productivite'].mean())/groupeNormal['productivite'].mean():.2f}% par rapport au normal")
+    print(f"    soit +{ecartGroupeSportSeul:.2f}% par rapport au normal")
     print(f"Double surcharge (café + sport élevés):")
     print(f"    nb elemennts = {len(groupeDoubleSurcharge)}")
     print(f"    productivite moyenne = {groupeDoubleSurcharge['productivite'].mean():.2f}")
-    print(f"    soit +{100*(groupeDoubleSurcharge['productivite'].mean() - groupeNormal['productivite'].mean())/groupeNormal['productivite'].mean():.2f}% par rapport au normal")
+    print(f"    soit +{ecartGroupeDoubleSurcharge:.2f}% par rapport au normal")
     print()
 
     # Test ANOVA
@@ -306,11 +437,54 @@ def analyseSurchargeProductivite():
     print(f"P-value: {pValueT:.4f}")
     print()
 
+    conclusion = "La double surcharge (café élevé + sport élevé) ne baisse pas la productivité par rapport au groupe normal.\nOn observe que c'est surtout la forte consomation de café qui augmente la productivité."
     print("Conclusion:")
-    print("La double surcharge (café élevé + sport élevé) ne baisse pas la productivité par rapport au groupe normal.\nOn observe que c'est surtout la forte consomation de café qui augmente la productivité.")
+    print(conclusion)
+
+    res = {
+        "anova": {
+            "f_stat": fStat,
+            "p_value": pValueAnova
+        },
+        "ttest": {
+            "t_stat": tStat,
+            "p_value": pValueT,
+            "diff_moyenne": diffMoyenne
+        },
+        "stats": [
+            {
+                "groupe": "normal",
+                "productivite_moyenne": groupeNormal['productivite'].mean(),
+                "nb_elements": len(groupeNormal),
+                "ecart_relatif": 0.0
+            },
+            {
+                "groupe": "cafe_eleve",
+                "productivite_moyenne": groupeCafeSeul['productivite'].mean(),
+                "nb_elements": len(groupeCafeSeul),
+                "ecart_relatif": ecartGroupeCafeSeul
+
+            },
+            {
+                "groupe": "sport_eleve",
+                "productivite_moyenne": groupeSportSeul['productivite'].mean(),
+                "nb_elements": len(groupeSportSeul),
+                "ecart_relatif": ecartGroupeSportSeul
+            },
+            {
+                "groupe": "double_surcharge",
+                "productivite_moyenne": groupeDoubleSurcharge['productivite'].mean(),
+                "nb_elements": len(groupeDoubleSurcharge),
+                "ecart_relatif": ecartGroupeDoubleSurcharge
+            }
+        ],
+        "conclusion": conclusion
+    }
+
+    return res
 
 
-def analyserEquilibreTempsProductivite():
+def analyseEquilibreTempsProductivite():
     try:
         dfSport = getSportDF()
     except Exception as e:
@@ -342,45 +516,199 @@ def analyserEquilibreTempsProductivite():
     print(f"Temps total moyen: {dfMerge['tempsTotal'].mean():.2f}h ± {dfMerge['tempsTotal'].std():.2f}h")
     print(f"  - Heures de travail: {dfMerge['heures_travail'].mean():.2f}h ± {dfMerge['heures_travail'].std():.2f}h")
     print(f"  - Heures de sport: {dfMerge['heures_sport'].mean():.2f}h ± {dfMerge['heures_sport'].std():.2f}h")
-    
+    print()
+
     # Corrélation linéaire
     corrLineaire, pValueLineaire = stats.pearsonr(dfMerge['tempsTotal'], dfMerge['productivite'])
     print(f"Corrélation de Pearson: {corrLineaire:.4f} (p = {pValueLineaire:.4f})")
+    conclusion = "Il ne semble pas y avoir de corrélation linéaire significative entre le temps total et la productivité."
+    print(conclusion)
     print()
-    
-    # Régression polynomiale (degré 2) pour détecter un optimum
-    coeffs = np.polyfit(dfMerge['tempsTotal'], dfMerge['productivite'], 2)
-    a, b, c = coeffs
-    
-    print(f"Équation: y = {a:.4f}x² + {b:.4f}x + {c:.4f}")
-    
-    # Calculer R²
-    yPred = np.polyval(coeffs, dfMerge['tempsTotal'])
-    r2 = 1 - (np.sum((dfMerge['productivite'] - yPred)**2) / 
-              np.sum((dfMerge['productivite'] - dfMerge['productivite'].mean())**2))
-    print(f"R²: {r2:.4f}")
-    print()
-    
-    # Point optimal (si parabole concave, a < 0)
-    if a < 0:
-        tempsOptimal = -b / (2 * a)
-        productiviteOptimale = np.polyval(coeffs, tempsOptimal)
-        print(f"Optimum détecté (parabole concave):")
-        print(f"  Temps total optimal: {tempsOptimal:.2f} heures")
-        print(f"  Productivité maximale: {productiviteOptimale:.2f}")
 
-        tracerPolynome(dfMerge['productivite'],dfMerge['tempsTotal'], coeffs, "equilibre", show=True)
-    else:
-        tempsOptimal = None
-        productiviteOptimale = None
-        print("Pas d'optimum (parabole convexe, a > 0)")
-    
-    return {
-        'dfMerge': dfMerge,
-        'corrLineaire': corrLineaire,
-        'pValueLineaire': pValueLineaire,
-        'coeffsPolynome': coeffs,
-        'r2': r2,
-        'tempsOptimal': tempsOptimal,
-        'productiviteOptimale': productiviteOptimale
+    res = {
+        "n": len(dfMerge),
+        "temps_total_moyen": {
+            "moyenne": dfMerge['tempsTotal'].mean(),
+            "std": dfMerge['tempsTotal'].std()
+        },
+        "corr": {
+            "corr_pearson": corrLineaire,
+            "p_value": pValueLineaire
+        },
+        "conclusion": conclusion
     }
+
+    return res
+
+
+def analyseCorrelationCaloriesCafe():
+    try:
+        dfSport = getSportDF()
+    except Exception as e:
+        print(f"Impossible de continuer : les données n'ont pas pu être chargées. Erreur: {e}")
+        return
+    
+    try:
+        dfTravail = getTravailDF()
+    except Exception as e:
+        print(f"Impossible de continuer : les données n'ont pas pu être chargées. Erreur: {e}")
+        return
+    
+    # Agréger le sport par jour
+    dfSportJour = dfSport.groupby(['individu_id', 'date']).agg({
+        'calories': 'sum'
+    }).reset_index()
+    
+    # Fusion
+    dfMerge = dfTravail.merge(dfSportJour, on=['individu_id', 'date'], how='inner')
+    
+    print(f"\nNombre d'observations: {len(dfMerge)}")
+    print(f"Calories moyennes: {dfMerge['calories'].mean():.2f} kcal")
+    print(f"Tasses de café moyennes: {dfMerge['tasses_cafe'].mean():.2f}")
+    
+    # Corrélation de Pearson
+    corrPearson, pValuePearson = stats.pearsonr(dfMerge['calories'], dfMerge['tasses_cafe'])
+    
+    print(f"Corrélation de Pearson: {corrPearson:.4f} (p = {pValuePearson:.4f})")
+    conclusion = "Il n'y a pas de corrélation significative entre les calories brûlées et la consommation de café."
+    print(conclusion)
+    print()
+
+    res = {
+        "n": len(dfMerge),
+        "calories_moyennes": dfMerge['calories'].mean(),
+        "tasses_cafe_moyennes": dfMerge['tasses_cafe'].mean(),
+        "conclusion": conclusion,
+        "corr": {
+            "corr_pearson": corrPearson,
+            "p_value": pValuePearson
+        }
+    }
+    return res
+
+
+def analyseeSportifsConsommationCafe():
+    try:
+        dfSport = getSportDF()
+    except Exception as e:
+        print(f"Impossible de continuer : les données n'ont pas pu être chargées. Erreur: {e}")
+        return
+    
+    try:
+        dfTravail = getTravailDF()
+    except Exception as e:
+        print(f"Impossible de continuer : les données n'ont pas pu être chargées. Erreur: {e}")
+        return
+
+    # Calculer le niveau sportif par individu (calories totales)
+    niveauSportif = dfSport.groupby('individu_id').agg({
+        'calories': 'sum',
+        'duree': 'sum'
+    }).reset_index()
+    niveauSportif.columns = ['individu_id', 'caloriesTotal', 'dureeTotal']
+    
+    # Calculer la consommation de café par individu
+    consommationCafe = dfTravail.groupby('individu_id').agg({
+        'tasses_cafe': 'mean'
+    }).reset_index()
+    consommationCafe.columns = ['individu_id', 'cafeMoyen']
+    
+    # Fusion
+    dfMerge = niveauSportif.merge(consommationCafe, on='individu_id')
+    
+    print(f"Nombre d'individus: {len(dfMerge)}")
+    
+    # Séparer en 3 groupes (tertiles)
+    tertile1 = dfMerge['dureeTotal'].quantile(0.33)
+    tertile2 = dfMerge['dureeTotal'].quantile(0.66)
+
+    print(f"Seuils de catégorisation:")
+    print(f"  Peu sportif: < {tertile1:.0f} min total")
+    print(f"  Moyennement sportif: {tertile1:.0f} - {tertile2:.0f} min")
+    print(f"  Très sportif: > {tertile2:.0f} min")
+    print()
+
+    # Créer les groupes
+    groupePeuSportif = dfMerge[dfMerge['dureeTotal'] < tertile1]
+    groupeMoyennement = dfMerge[(dfMerge['dureeTotal'] >= tertile1) & (dfMerge['dureeTotal'] < tertile2)]
+    groupeTresSportif = dfMerge[dfMerge['dureeTotal'] >= tertile2]
+
+    print(f"Peu sportif (n={len(groupePeuSportif)}):")
+    print(f"  Café moyen: {groupePeuSportif['cafeMoyen'].mean():.2f} tasses")
+    print(f"  Écart-type: {groupePeuSportif['cafeMoyen'].std():.2f}")
+    
+    print(f"\nMoyennement sportif (n={len(groupeMoyennement)}):")
+    print(f"  Café moyen: {groupeMoyennement['cafeMoyen'].mean():.2f} tasses")
+    print(f"  Écart-type: {groupeMoyennement['cafeMoyen'].std():.2f}")
+    
+    print(f"\nTrès sportif (n={len(groupeTresSportif)}):")
+    print(f"  Café moyen: {groupeTresSportif['cafeMoyen'].mean():.2f} tasses")
+    print(f"  Écart-type: {groupeTresSportif['cafeMoyen'].std():.2f}")
+    print()
+    
+    # Test ANOVA
+    fStat, pValueAnova = stats.f_oneway(
+        groupePeuSportif['cafeMoyen'],
+        groupeMoyennement['cafeMoyen'],
+        groupeTresSportif['cafeMoyen']
+    )
+    
+    print(f"F-statistique: {fStat:.4f}")
+    print(f"P-value: {pValueAnova:.4f}")
+    print("Différence entre les groupes (p < 0.05)")
+    print()
+
+    # Comparaison directe: Très sportif vs Peu sportif
+    tStat, pValueT = stats.ttest_ind(groupeTresSportif['cafeMoyen'], groupePeuSportif['cafeMoyen'])
+    diffMoyenne = groupeTresSportif['cafeMoyen'].mean() - groupePeuSportif['cafeMoyen'].mean()
+    
+    print(f"Différence de consommation: {diffMoyenne:.2f} tasses")
+    print(f"T-statistique: {tStat:.4f}")
+    print(f"P-value: {pValueT:.4f}")
+    print()
+    
+    # Corrélation globale
+    corrPearson, pValueCorr = stats.pearsonr(dfMerge['caloriesTotal'], dfMerge['cafeMoyen'])
+    print(f"Corrélation de Pearson: {corrPearson:.4f} (p = {pValueCorr:.4f})")
+    conclusion = "Les individus très sportifs ont une consommation de café quasiment égale à celle des individus peu sportifs."
+    print(f"Conclusion: {conclusion}")
+    print()
+
+    res = {
+        "conclusion": conclusion,
+        "anova": {
+            "f_stat": fStat,
+            "p_value": pValueAnova
+        },
+        "ttest": {
+            "diff_moyenne": diffMoyenne,
+            "t_stat": tStat,
+            "p_value": pValueT
+        },
+        "corr": {
+            "corr_pearson": corrPearson,
+            "p_value": pValueCorr
+        },
+        "stats": [
+            {
+                "groupe": "peu_sportif",
+                "n": len(groupePeuSportif),
+                "cafe_moyen": groupePeuSportif['cafeMoyen'].mean(),
+                "std": groupePeuSportif['cafeMoyen'].std()
+            },
+            {
+                "groupe": "moyennement_sportif",
+                "n": len(groupeMoyennement),
+                "cafe_moyen": groupeMoyennement['cafeMoyen'].mean(),
+                "std": groupeMoyennement['cafeMoyen'].std()
+            },
+            {
+                "groupe": "tres_sportif",
+                "n": len(groupeTresSportif),
+                "cafe_moyen": groupeTresSportif['cafeMoyen'].mean(),
+                "std": groupeTresSportif['cafeMoyen'].std()
+            }
+        ]
+    }
+
+    return res
