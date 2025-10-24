@@ -137,3 +137,32 @@ def nettoyageDataTravail(dfTravail: pd.DataFrame, debug: bool = False) -> pd.Dat
 
     print('Données sport nettoyées avec succès.\n')
     return dfClean
+
+
+def getSportDF():
+    cheminCSV = "./data/sport_raw.csv"
+    
+    # Chargement des données
+    dfSport = loadData(cheminCSV)
+    if dfSport is None:
+        print("Impossible de continuer : les données n'ont pas pu être chargées.")
+        raise Exception("Données sport non chargées")
+    
+    # Nettoyage des données
+    dfSport = nettoyageDataSport(dfSport)
+
+    return dfSport
+
+def getTravailDF():
+    cheminCSV = "./data/travail_raw.csv"
+    
+    # Chargement des données
+    dfTravail = loadData(cheminCSV)
+    if dfTravail is None:
+        print("Impossible de continuer : les données n'ont pas pu être chargées.")
+        raise Exception("Données travail non chargées")
+    
+    # Nettoyage des données
+    dfTravail = nettoyageDataTravail(dfTravail)
+
+    return dfTravail

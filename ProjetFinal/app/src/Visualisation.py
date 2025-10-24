@@ -76,7 +76,7 @@ def tracerRegression3D(X_duree: np.ndarray, X_poids: np.ndarray, Y: np.ndarray, 
         plt.show()
     plt.close()
 
-def tracerPolynome(X: np.ndarray, Y: np.ndarray, coeffs: np.ndarray, show: bool = False) -> None:
+def tracerPolynome(X: np.ndarray, Y: np.ndarray, coeffs: np.ndarray, type: str, show: bool = False) -> None:
     plt.figure(figsize=(10, 6))
     
     #Nuage de points
@@ -88,17 +88,22 @@ def tracerPolynome(X: np.ndarray, Y: np.ndarray, coeffs: np.ndarray, show: bool 
     plt.plot(X_fit, Y_fit, 'r', label=f"Régression polynomiale \n y = {coeffs[0]:.2f}x² + {coeffs[1]:.2f}x + {coeffs[2]:.2f}")
 
     #Noms des axes et titre
-    plt.xlabel('Nombre de tasses de café (unités)')
-    plt.ylabel('Productivité (unités)')
-    plt.title('Régression polynomiale de la productivité en fonction du nombre de tasses de café')
+    if type == "equilibre":
+        plt.xlabel('Temps total (heures)')
+        plt.ylabel('Productivité (unités)')
+        plt.title('Régression polynomiale de la productivité en fonction du temps total')
+    elif type == "productivite":
+        plt.xlabel('Nombre de tasses de café (unités)')
+        plt.ylabel('Productivité (unités)')
+        plt.title('Régression polynomiale de la productivité en fonction du nombre de tasses de café')
     plt.legend()
 
     #Grille
     plt.grid(True, alpha=0.3)
 
     #Sauvegarder le graphique
-    plt.savefig(f'../app/resultats/RegressionPolynomiale_productivite.png', dpi=300, bbox_inches='tight')
-    print(f"    Graphique de régression polynomiale sauvegardé sous: '/app/resultats/RegressionPolynomiale_productivite.png'")
+    plt.savefig(f'../app/resultats/RegressionPolynomiale_{type}.png', dpi=300, bbox_inches='tight')
+    print(f"    Graphique de régression polynomiale sauvegardé sous: '/app/resultats/RegressionPolynomiale_{type}.png'")
 
     #Afficher le graphique
     if show:
