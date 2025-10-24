@@ -7,8 +7,11 @@ Ce mettre dans le répertoire app et lancer la commande :
 
     python main.py -> pour l'app console
     python api.py -> pour l'api flask
-
+    
     Les images générées seront dans le dossier app/resultats
+
+    Pour Docker utiliser la commande suivante dans le répertoire app :
+    docker-compose up --build
 
     Listes des Api disponibles:
         /api/v1/analyses/sport/lineaire                                "Analyse des activités sportives linéaire"
