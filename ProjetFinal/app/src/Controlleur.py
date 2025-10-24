@@ -17,6 +17,7 @@ def analyseSportLineaire():
     # Statistiques descriptives
     #infoDataFrame(dfSport)
 
+    resultats = []
     print("Analyse des activités sportives linéaire:")
     for activite in ['course', 'natation', 'velo']:
         # Modélisation par regression linéaire
@@ -29,22 +30,23 @@ def analyseSportLineaire():
         print(f"  p-value: {p_value:.2f}")
         print(f"  Erreur standard: {std_er:.2f} et t = a / std_er = {slope/std_er:.2f}")
         
-        res["lineaire"]["activite"].append(activite)
+        resActivite = {
+            "activite": activite,
+            "stats": {
+                "pente": slope,
+                "intercept": intercept,
+                "r2": r_value**2,
+                "p_value": p_value,
+                "std_error": std_er
+            }
+        }
+        resultats.append(resActivite)
+
         #Visualisation
         tracerRegression(X, Y, slope, intercept, activite)
     print()
-
-    res = {
-        "activite": [
-            "nom",
-            "slope",
-            "intercept",
-            "r2",
-            "p_value",
-            "std_error"
-        ]
-    }
-    return res
+    
+    return resultats
 
 def analyseSportMultivariee():
     try:

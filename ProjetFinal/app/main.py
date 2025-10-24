@@ -16,7 +16,7 @@ def run_menu():
 
     while True:
         print("\n=== Menu d'analyse ===")
-        for k in [str(i) for i in range(1, 9)]:
+        for k in [str(i) for i in range(1, 10)]:
             if k in options:
                 print(f"{k}. {options[k][0]}")
         print("0. Quitter")
